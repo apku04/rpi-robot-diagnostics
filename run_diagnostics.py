@@ -33,6 +33,13 @@ TESTS = [
         'critical': False,
         'enabled': True,
         'args': {'visual': False}  # Set to True for visual tests
+    },
+    {
+        'name': 'USB Microphone',
+        'module': 'test_microphone',
+        'critical': False,
+        'enabled': True,
+        'args': {'quick': True}  # Set to False for audio recording test
     }
 ]
 

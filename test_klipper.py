@@ -7,6 +7,7 @@ Tests connection to Bigtreetech Octopus Pro V1.0 via Moonraker API
 import sys
 import time
 import json
+import os
 
 try:
     import requests
@@ -97,7 +98,36 @@ def send_gcode_command(command):
     except Exception as e:
         return {'success': False, 'error': str(e)}
 
-def run_test(quick=False):
+def check_usb_devices():
+    """Check for connected USB serial devices (Klipper MCUs)"""
+    serial_path = "/dev/serial/by-id"
+    if not os.path.exists(serial_path):
+        return {'success': False, 'message': 'No serial devices found (no /dev/serial/by-id)'}
+        
+    try:
+        devices = os.listdir(serial_path)
+    except OSError:
+        return {'success': False, 'message': 'Could not list /dev/serial/by-id'}
+
+    # Filter for likely candidates
+    klipper_devs = [d for d in devices if 'Klipper' in d or 'STM32' in d or 'BigTreeTech' in d or 'usb' in d]
+    
+    if klipper_devs:
+        return {
+            'success': True, 
+            'message': f"Found device: {klipper_devs[0]}",
+            'devices': klipper_devs
+        }
+    elif devices:
+        return {
+            'success': False,
+            'message': f"Found serial devices, but not recognized as Klipper: {', '.join(devices)}",
+            'devices': devices
+        }
+    else:
+        return {'success': False, 'message': 'No devices in /dev/serial/by-id'}
+
+def run_test(quick=False, mock=False):
     """
     Test Klipper/Moonraker connection and MCU status
     """
@@ -106,6 +136,23 @@ def run_test(quick=False):
         'message': '',
         'klipper': {}
     }
+
+    if mock:
+        # Return simulated success for testing without hardware
+        return {
+            'status': 'pass',
+            'message': 'Klipper Ready (MOCK) | mcu: v0.10.0-mock',
+            'klipper': {
+                'connection': {'success': True, 'message': 'Mock connection'},
+                'state': 'ready',
+                'mcu': {
+                    'success': True,
+                    'mcus': {
+                        'mcu': {'mcu_version': '0.10.0-mock', 'last_stats': {'mcu_task_avg': 0.1}}
+                    }
+                }
+            }
+        }
     
     if not REQUESTS_AVAILABLE:
         result['error'] = 'requests library not installed (pip install requests)'
@@ -117,9 +164,21 @@ def run_test(quick=False):
     result['klipper']['connection'] = conn_result
     
     if not conn_result['success']:
-        result['status'] = 'fail'
-        result['error'] = conn_result.get('error')
-        result['message'] = f"Moonraker unreachable: {conn_result.get('error')}"
+        # Moonraker failed, check for physical USB device
+        usb_result = check_usb_devices()
+        result['klipper']['usb'] = usb_result
+        
+        if usb_result['success']:
+            # Hardware found, software missing
+            result['status'] = 'fail' # Still fail because full stack isn't ready
+            result['message'] = f"Hardware detected ({usb_result['devices'][0]}), but Moonraker not running."
+            result['error'] = "Service 'moonraker' not running or not installed"
+        else:
+            # Neither hardware nor software found
+            result['status'] = 'fail'
+            result['error'] = conn_result.get('error')
+            result['message'] = f"Moonraker unreachable AND {usb_result['message']}"
+            
         return result
         
     klipper_state = conn_result['data'].get('result', {}).get('state', 'unknown')

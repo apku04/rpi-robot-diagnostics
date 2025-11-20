@@ -18,7 +18,8 @@ MUX_ADDR = 0x70
 # Sensor configuration
 SENSORS = [
     {'name': 'SHT31', 'channel': 0, 'address': 0x44, 'type': 'sht3x'},
-    {'name': 'BMP280', 'channel': 1, 'address': 0x76, 'type': 'bme280'}
+    {'name': 'BMP280', 'channel': 1, 'address': 0x76, 'type': 'bme280'},
+    {'name': 'BMP280_motor', 'channel': 4, 'address': 0x76, 'type': 'bme280'}
 ]
 
 def select_mux_channel(bus, channel):

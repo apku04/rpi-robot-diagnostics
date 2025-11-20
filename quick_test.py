@@ -32,11 +32,21 @@ def run_test():
             for addr in range(0x03, 0x78):
                 if addr == MUX_ADDR:
                     continue
+                found = False
                 try:
                     bus.read_byte(addr)
-                    devices.append(f"0x{addr:02X}")
+                    found = True
                 except:
-                    pass
+                    # Some devices (like SHT31) might not ACK a read without a command
+                    # Try writing a dummy byte (0x00) to see if it ACKs
+                    try:
+                        bus.write_byte(addr, 0x00)
+                        found = True
+                    except:
+                        pass
+                
+                if found:
+                    devices.append(f"0x{addr:02X}")
             
             if devices:
                 print(", ".join(devices))

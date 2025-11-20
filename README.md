@@ -9,6 +9,8 @@ This diagnostic suite tests:
 - ✅ SHT31/SHT4x Temperature & Humidity Sensor
 - ✅ BMP280/BME280 Temperature & Pressure Sensor
 - ✅ SH1107/SH1106 OLED Displays (128x128)
+- ✅ USB Microphone (Audio Capture)
+- ✅ Klipper/Moonraker Motor Controller (Octopus Pro)
 
 ## Quick Start
 
@@ -40,14 +42,25 @@ python3 run_diagnostics.py --list
 Each test module can be run standalone:
 
 ```bash
-# Test I2C multiplexer
+# Test individual components
 python3 test_multiplexer.py
-
-# Test temperature sensors
 python3 test_temperature.py
-
-# Test OLED displays
 python3 test_oled.py
+python3 test_microphone.py
+python3 test_klipper.py
+```
+
+## Hardware Setup
+
+| Channel | Device | Address | Description |
+|---------|--------|---------|-------------|
+| - | PCA9548A | 0x70 | I2C Multiplexer |
+| 0 | SHT31 | 0x44 | Temp & Humidity |
+| 1 | BMP280 | 0x76 | Temp & Pressure |
+| 2 | OLED 1 | 0x3D | Display 128x128 |
+| 3 | OLED 2 | 0x3C | Display 128x128 |
+| USB | Microphone | - | USB Audio Input |
+| USB | Octopus Pro | - | Klipper MCU |
 ```
 
 ### Module Structure

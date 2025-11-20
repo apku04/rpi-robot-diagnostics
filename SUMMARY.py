@@ -21,6 +21,8 @@ Core Diagnostic System:
   • test_multiplexer.py      PCA9548A multiplexer test module
   • test_temperature.py      Temperature sensor test module
   • test_oled.py             OLED display test module
+  • test_microphone.py       USB microphone test module
+  • test_klipper.py          Klipper/Octopus motor controller test
 
 Documentation:
   • README.md                Comprehensive documentation
@@ -61,6 +63,10 @@ Silent Mode (for scripts):
   ├── Channel 1: BMP280 (0x76) - Temp & Pressure ✓
   ├── Channel 2: OLED Display 1 (0x3D) - 128x128 ✓
   └── Channel 3: OLED Display 2 (0x3C) - 128x128 ✓
+  
+  USB Devices:
+  ├── Microphone: JOUNIVO USB Audio ✓
+  └── Motor Controller: Octopus Pro (Klipper) [Check Status]
 
   All devices tested and working! 🎉
 

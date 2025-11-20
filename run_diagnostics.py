@@ -40,6 +40,12 @@ TESTS = [
         'critical': False,
         'enabled': True,
         'args': {'quick': True}  # Set to False for audio recording test
+    },
+    {
+        'name': 'Motor Controller (Klipper)',
+        'module': 'test_klipper',
+        'critical': False,
+        'enabled': True
     }
 ]
 

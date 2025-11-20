@@ -10,6 +10,7 @@ Add new test modules to the TESTS list to extend functionality.
 import sys
 import time
 import importlib.util
+import inspect
 from pathlib import Path
 from datetime import datetime
 
